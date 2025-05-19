@@ -1,0 +1,179 @@
+<?xml version='1.0'?>
+<robot name="robot_ipsa" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:include filename="$(find in426_desc)/xacro/material.xacro"/>
+  <xacro:include filename="$(find in426_desc)/xacro/Robot_2/robot_2.gazebo"/>
+
+  <xacro:property name="base_width" value="0.5"/>
+  <xacro:property name="base_height" value="0.1"/>
+
+  <xacro:property name="arm1_radius" value="0.1"/>
+  <xacro:property name="arm1_length" value="0.4"/>
+
+  <xacro:property name="arm2_radius" value="0.08"/>
+  <xacro:property name="arm2_length" value="0.4"/>
+
+  <xacro:property name="arm3_sub_radius" value="0.04"/>
+  <xacro:property name="arm3_sub_length" value="0.05"/>
+
+  <xacro:property name="arm3_radius" value="0.03"/>
+  <xacro:property name="arm3_length" value="0.25"/>
+
+  <xacro:property name="link_4_length" value="0.025"/>
+  <xacro:property name="link_4_radius" value="0.015"/>
+
+  <xacro:include filename="$(find in426_desc)/xacro/Robot_2/robot_2_ros2_control.xacro"/>
+
+  <xacro:macro name="box_inertial" params="mass width height depth ox oy oz">
+    <inertial>
+      <mass value="${mass}"/>
+      <origin xyz="${ox} ${oy} ${oz}"/>
+      <inertia ixx="${mass / 12 * (height*height + depth*depth)}"
+        iyy="${mass / 12 * (width*width + depth*depth)}"
+        izz="${mass / 12 * (width*width + height*height)}"
+        ixy="0" iyz="0" ixz="0"/>
+    </inertial>
+  </xacro:macro>
+
+  <xacro:macro name="cylinder_inertial" params="mass radius length ox oy oz">
+    <inertial>
+      <origin xyz="${ox} ${oy} ${oz}"/>
+      <mass value="${mass}"/>
+      <inertia ixx="${mass*(3*radius*radius+length*length)/12}" ixy="0.0" ixz="0.0" iyy="${mass*(3*radius*radius+length*length)/12}" iyz="0.0" izz="${mass*radius*radius/2}"/>
+    </inertial>
+  </xacro:macro>
+
+  <!-- ***************************************** -->
+  <link name="world"/>
+  <joint name="world_to_base" type="fixed">
+    <parent link="world"/>
+    <child link="base_link"/>
+    <origin xyz="0 0 ${base_height/2}"/>
+  </joint>
+
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <box size="${base_width} ${base_width} ${base_height}"/>
+      </geometry>
+      <material name="black"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="${base_width} ${base_width} ${base_height}"/>
+      </geometry>
+    </collision>
+    <xacro:box_inertial mass="5" width="${base_width}" height="${base_width}" depth="${base_height}" ox="0" oy="0" oz="0"/>
+  </link>
+
+  <!-- Link 1 -->
+  <link name="link_1">
+    <visual>
+      <origin xyz="0 0 ${arm1_length/2 + base_height/2}"/>
+      <geometry>
+        <cylinder radius="${arm1_radius}" length="${arm1_length}"/>
+      </geometry>
+      <material name="red"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 ${arm1_length/2 + base_height/2}"/>
+      <geometry>
+        <cylinder radius="${arm1_radius}" length="${arm1_length}"/>
+      </geometry>
+    </collision>
+    <xacro:cylinder_inertial mass="0.5" radius="${arm1_radius}" length="${arm1_length}" ox="0" oy="0" oz="${arm1_length/2 + base_height/2}"/>
+  </link>
+  <joint name="base_link_to_1" type="revolute">
+    <parent link="base_link"/>
+    <child link="link_1"/>
+    <axis xyz="0 0 1"/>
+    <dynamics damping="0.7"/>
+    <limit effort="100" lower="${-pi/2}" upper="${pi/2}" velocity="1.0"/>
+  </joint>
+
+  <!-- Link 2 -->
+  <link name="link_2">
+    <visual>
+      <origin xyz="0 0 ${-arm2_length/2+0.05}"/>
+      <geometry>
+        <cylinder radius="${arm2_radius}" length="${arm2_length}"/>
+      </geometry>
+      <material name="red"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 ${-arm2_length/2+0.05}"/>
+      <geometry>
+        <cylinder radius="${arm2_radius}" length="${arm2_length}"/>
+      </geometry>
+    </collision>
+    <xacro:cylinder_inertial mass="0.3" radius="${arm2_radius}" length="${arm2_length}" ox="0" oy="0" oz="${-arm2_length/2+0.05}"/>
+  </link>
+  <joint name="1_to_2" type="prismatic">
+    <parent link="link_1"/>
+    <child link="link_2"/>
+    <origin xyz="0 0 ${arm1_length + 2*arm3_sub_radius}" rpy="0 0 ${-pi/2}"/>
+    <axis xyz="0 0 1"/>
+    <dynamics damping="0.7"/>
+    <limit effort="1000" lower="0" upper="0.3" velocity="1.0"/>
+  </joint>
+
+  <!-- Link 3 -->
+  <link name="link_3_sub">
+    <visual>
+      <origin xyz="0 0 ${arm3_sub_length/2+0.07}"/>
+      <geometry>
+        <cylinder radius="${arm3_sub_radius}" length="${arm3_sub_length}"/>
+      </geometry>
+      <material name="green"/>
+    </visual>
+     <collision>
+      <origin xyz="0 0 ${arm3_sub_length/2+0.07}"/>
+      <geometry>
+        <cylinder radius="${arm3_sub_radius}" length="${arm3_sub_length}"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="2_to_3_sub" type="fixed">
+    <parent link="link_2"/>
+    <child link="link_3_sub"/>
+    <origin rpy="${-pi/2} 0 0"/>
+  </joint>
+
+  <link name="link_3">
+    <visual>
+      <geometry>
+        <cylinder radius="${arm3_radius}" length="${arm3_length}"/>
+      </geometry>
+      <material name="green"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder radius="${arm3_radius}" length="${arm3_length}"/>
+      </geometry>
+    </collision>
+    <xacro:cylinder_inertial mass="0.2" radius="${arm3_radius}" length="${arm3_length}" ox="0" oy="0" oz="0"/>
+  </link>
+  <joint name="2_to_3" type="prismatic">
+    <parent link="link_2"/>
+    <child link="link_3"/>
+    <origin rpy="${-pi/2} 0 0"/>
+    <axis xyz="0 0 1"/>
+    <dynamics damping="0.7"/>
+    <limit effort="100" lower="0" upper="${arm3_length/2 + 0.1}" velocity="1.0"/>
+  </joint>
+
+  <!-- End effector -->
+  <link name="link_4">
+		<visual>
+			<origin xyz="0 0 ${-link_4_length/2}" rpy="0 0 0"/>
+			<geometry>
+				<cylinder radius="${link_4_radius}" length="${link_4_length}"/>
+			</geometry>
+			<material name="blue"/>
+		</visual>
+	</link>
+	<joint name="3_to_4" type="fixed">
+		<parent link="link_3"/>
+		<child link="link_4"/>
+		<origin xyz="0 0 ${arm3_length/2 + link_4_length}"/>
+	</joint>
+</robot>

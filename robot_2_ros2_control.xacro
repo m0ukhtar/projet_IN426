@@ -1,0 +1,32 @@
+<?xml version='1.0'?>
+<robot name="robot_ipsa" xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <ros2_control name="GazeboSystem" type="system">
+        <hardware>
+            <plugin>gazebo_ros2_control/GazeboSystem</plugin>
+        </hardware>
+
+        <joint name="base_link_to_1">
+            <command_interface name="position">
+                <param name="min">-${pi/2}</param>
+                <param name="max">${pi/2}</param>
+            </command_interface>
+            <state_interface name="position"/>
+        </joint>
+
+        <joint name="1_to_2">   
+            <command_interface name="position">
+                <param name="min">0</param>
+                <param name="max">0.3</param>
+            </command_interface>
+            <state_interface name="position"/>
+        </joint>
+
+        <joint name="2_to_3">
+            <command_interface name="position">
+                <param name="min">0</param>
+                <param name="max">${arm3_length/2 + 0.1}</param>
+            </command_interface>
+            <state_interface name="position"/>
+        </joint>
+    </ros2_control>
+</robot>
