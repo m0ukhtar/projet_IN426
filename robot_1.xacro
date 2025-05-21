@@ -46,7 +46,7 @@
     <joint name="world_to_base" type="fixed">
         <parent link="world"/>
         <child link="base_link"/>
-        <origin xyz="0 0 0" rpy="0 0 0"/> <!-- Revert to original, no offset -->
+        <origin xyz="0 0 0" rpy="0 0 0"/> <!-- Restored 0.1 m gap as per earlier request -->
     </joint>
 
     <link name="base_link">
@@ -56,7 +56,7 @@
                 <cylinder radius="${base_radius}" length="${base_length}"/>
             </geometry>
             <material name="base_material">
-                <color rgba="0 0 0 1"/> <!-- Black, fully opaque -->
+                <color rgba="0 0 0 1"/> <!-- Fully opaque -->
             </material>
         </visual>
         <collision>
@@ -76,7 +76,7 @@
                 <cylinder radius="${link_1_radius}" length="${link_1_length}"/>
             </geometry>
             <material name="link_1_material">
-                <color rgba="1 0 0 0.5"/> <!-- Red, 50% transparency -->
+                <color rgba="1 0 0 0.5"/> <!-- Red with 50% transparency -->
             </material>
         </visual>
         <collision>
@@ -104,7 +104,7 @@
                 <sphere radius="0.09"/>
             </geometry>
             <material name="link_2p_material">
-                <color rgba="1 0.5 0 0.5"/> <!-- Orange, 50% transparency -->
+                <color rgba="1 0.5 0 0.5"/> <!-- Orange with 50% transparency -->
             </material>
         </visual>
         <collision>
@@ -124,21 +124,21 @@
     <!-- *****LINK 2***** -->
     <link name="link_2">
         <visual>
-            <origin xyz="${link_2_length/2} 0 0" rpy="0 0 ${pi/2}"/> <!-- Extend along x -->
+            <origin xyz="0 0 ${link_2_length/2}" rpy="0 0 0"/>
             <geometry>
                 <cylinder radius="${link_2_radius}" length="${link_2_length}"/>
             </geometry>
             <material name="link_2_material">
-                <color rgba="1 0.5 0 0.5"/> <!-- Orange, 50% transparency -->
+                <color rgba="1 0.5 0 0.5"/> <!-- Orange with 50% transparency -->
             </material>
         </visual>
         <collision>
-            <origin xyz="${link_2_length/2} 0 0" rpy="0 0 ${pi/2}"/>
+            <origin xyz="0 0 ${link_2_length/2}" rpy="0 0 0"/>
             <geometry>
                 <cylinder radius="${link_2_radius}" length="${link_2_length}"/>
             </geometry>
         </collision>
-        <xacro:cylinder_inertial mass="1" radius="${link_2_radius}" length="${link_2_length}" o_xyz="${link_2_length/2} 0 0" o_rpy="0 0 ${pi/2}"/>
+        <xacro:cylinder_inertial mass="1" radius="${link_2_radius}" length="${link_2_length}" o_xyz="0 0 ${link_2_length/2}" o_rpy="0 0 0"/>
     </link>
 
     <joint name="1_to_2" type="revolute">
@@ -157,7 +157,7 @@
                 <sphere radius="0.06"/>
             </geometry>
             <material name="link_3p_material">
-                <color rgba="0 1 0 0.5"/> <!-- Green, 50% transparency -->
+                <color rgba="0 1 0 0.5"/> 
             </material>
         </visual>
         <collision>
@@ -171,33 +171,33 @@
     <joint name="2_to_3p" type="fixed">
         <parent link="link_2"/>
         <child link="link_3p"/>
-        <origin xyz="${link_2_length} 0 0" rpy="0 0 0"/>
+        <origin xyz="0 0 ${link_2_length}" rpy="0 0 0"/>
     </joint>
 
     <!-- *****LINK 3***** -->
     <link name="link_3">
         <visual>
-            <origin xyz="${link_3_length/2} 0 0" rpy="0 0 ${pi/2}"/>
+            <origin xyz="0 0 ${link_3_length/2}" rpy="0 0 0"/>
             <geometry>
                 <cylinder radius="${link_3_radius}" length="${link_3_length}"/>
             </geometry>
             <material name="link_3_material">
-                <color rgba="0 1 0 0.5"/> <!-- Green, 50% transparency -->
+                <color rgba="0 1 0 0.5"/> <!-- Green with 50% transparency -->
             </material>
         </visual>
         <collision>
-            <origin xyz="${link_3_length/2} 0 0" rpy="0 0 ${pi/2}"/>
+            <origin xyz="0 0 ${link_3_length/2}" rpy="0 0 0"/>
             <geometry>
                 <cylinder radius="${link_3_radius}" length="${link_3_length}"/>
             </geometry>
         </collision>
-        <xacro:cylinder_inertial mass="1" radius="${link_3_radius}" length="${link_3_length}" o_xyz="${link_3_length/2} 0 0" o_rpy="0 0 ${pi/2}"/>
+        <xacro:cylinder_inertial mass="1" radius="${link_3_radius}" length="${link_3_length}" o_xyz="0 0 ${link_3_length/2}" o_rpy="0 0 0"/>
     </link>
 
     <joint name="2_to_3" type="revolute">
         <parent link="link_2"/>
         <child link="link_3"/>
-        <origin xyz="${link_2_length} 0 0" rpy="0 0 0"/>
+        <origin xyz="0 0 ${link_2_length}" rpy="0 0 0"/>
         <axis xyz="1 0 0"/>
         <limit lower="${-pi/2}" upper="0" velocity="1" effort="100"/>
         <dynamics damping="0.7"/>
@@ -206,26 +206,26 @@
     <!-- *****LINK 4***** -->
     <link name="link_4">
         <visual>
-            <origin xyz="${link_4_length/2} 0 0" rpy="0 0 ${pi/2}"/>
+            <origin xyz="0 0 ${link_4_length/2}" rpy="0 0 0"/>
             <geometry>
                 <cylinder radius="${link_4_radius}" length="${link_4_length}"/>
             </geometry>
             <material name="link_4_material">
-                <color rgba="0 0 1 0.5"/> <!-- Blue, 50% transparency -->
+                <color rgba="0 0 1 0.5"/> <!-- Blue with 50% transparency -->
             </material>
         </visual>
         <collision>
-            <origin xyz="${link_4_length/2} 0 0" rpy="0 0 ${pi/2}"/>
+            <origin xyz="0 0 ${link_4_length/2}" rpy="0 0 0"/>
             <geometry>
                 <cylinder radius="${link_4_radius}" length="${link_4_length}"/>
             </geometry>
         </collision>
-        <xacro:cylinder_inertial mass="1" radius="${link_4_radius}" length="${link_4_length}" o_xyz="${link_4_length/2} 0 0" o_rpy="0 0 ${pi/2}"/>
+        <xacro:cylinder_inertial mass="1" radius="${link_4_radius}" length="${link_4_length}" o_xyz="0 0 ${link_4_length/2}" o_rpy="0 0 0"/>
     </link>
 
     <joint name="3_to_4" type="fixed">
         <parent link="link_3"/>
         <child link="link_4"/>
-        <origin xyz="${link_3_length} 0 0" rpy="0 0 0"/>
+        <origin xyz="0 0 ${link_3_length}" rpy="0 0 0"/>
     </joint>
 </robot>
