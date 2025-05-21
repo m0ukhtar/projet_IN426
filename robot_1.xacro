@@ -3,7 +3,6 @@
     <xacro:include filename="$(find in426_desc)/xacro/material.xacro"/>
     <xacro:include filename="$(find in426_desc)/xacro/Robot_1/robot_1_ros2_control.xacro"/>
     <xacro:include filename="$(find in426_desc)/xacro/Robot_1/robot_1.gazebo"/>
-
     <!-- VARIABLES -->
     <xacro:property name="base_radius" value="0.25"/>
     <xacro:property name="base_length" value="0.03"/>
@@ -22,10 +21,9 @@
             <origin xyz="${o_xyz}" rpy="${o_rpy}"/>
             <mass value="${mass}"/>
             <inertia ixx="${mass*(3*radius*radius+length*length)/12}" ixy="0.0" ixz="0.0"
-                     iyy="${mass*(3*radius*radius+length*length)/12}" iyz="0.0" izz="${mass*radius*radius/2}"/>
+            iyy="${mass*(3*radius*radius+length*length)/12}" iyz="0.0" izz="${mass*radius*radius/2}"/>
         </inertial>
     </xacro:macro>
-
     <xacro:macro name="sphere_inertial" params="mass radius o_xyz o_rpy">
         <inertial>
             <origin xyz="${o_xyz}" rpy="${o_rpy}"/>
@@ -35,33 +33,31 @@
         </inertial>
     </xacro:macro>
 
-    <!-- *****World link (no visual geometry)***** -->
-    <link name="world"/>
-
     <!-- *****Base link***** -->
+    <link name="world"/>
     <joint name="world_to_base" type="fixed">
         <parent link="world"/>
         <child link="base_link"/>
-        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <origin xyz="0 0 ${+base_length/2+link_1_length}"/>
     </joint>
-
     <link name="base_link">
         <visual>
             <origin xyz="0 0 ${base_length/2}" rpy="0 0 0"/>
             <geometry>
                 <cylinder radius="${base_radius}" length="${base_length}"/>
             </geometry>
-            <material name="black"/>
+            <material name="base_material">
+                <color rgba="0 0 0 1"/>
+            </material>
         </visual>
+        <xacro:cylinder_inertial mass="1" radius="${base_radius}" length="${base_length}" o_xyz="0 0 ${base_length/2}" o_rpy="0 0 0"/>
         <collision>
             <origin xyz="0 0 ${base_length/2}" rpy="0 0 0"/>
             <geometry>
                 <cylinder radius="${base_radius}" length="${base_length}"/>
             </geometry>
         </collision>
-        <xacro:cylinder_inertial mass="2" radius="${base_radius}" length="${base_length}" o_xyz="0 0 ${base_length/2}" o_rpy="0 0 0"/>
     </link>
-
     <!-- *****LINK 1***** -->
     <link name="link_1">
         <visual>
@@ -69,145 +65,147 @@
             <geometry>
                 <cylinder radius="${link_1_radius}" length="${link_1_length}"/>
             </geometry>
-            <material name="red"/>
+            <material name="link_1_material">
+                <color rgba="1 0 0 0.5"/>
+            </material>
         </visual>
+        <xacro:cylinder_inertial mass="1" radius="${link_1_radius}" length="${link_1_length}" o_xyz="0 0 ${link_1_length/2}" o_rpy="0 0 0"/>
         <collision>
             <origin xyz="0 0 ${link_1_length/2}" rpy="0 0 0"/>
             <geometry>
                 <cylinder radius="${link_1_radius}" length="${link_1_length}"/>
             </geometry>
         </collision>
-        <xacro:cylinder_inertial mass="1" radius="${link_1_radius}" length="${link_1_length}" o_xyz="0 0 ${link_1_length/2}" o_rpy="0 0 0"/>
     </link>
-
     <joint name="base_to_1" type="revolute">
+        <origin xyz="0 0 0"/>
         <parent link="base_link"/>
         <child link="link_1"/>
-        <origin xyz="0 0 ${base_length}" rpy="0 0 0"/>
         <axis xyz="0 0 1"/>
         <dynamics damping="0.7"/>
-        <limit effort="10" lower="${-pi/2}" upper="${pi/2}" velocity="1"/>
+        <limit effort="100" lower="${-pi/2}" upper="${pi/2}" velocity="1"/>
     </joint>
-
     <!-- *****LINK 2p***** -->
     <link name="link_2p">
         <visual>
             <geometry>
-                <sphere radius="${link_1_radius}"/>
+                <sphere radius="0.09"/>
             </geometry>
-            <material name="orange"/>
+            <material name="link_2p_material">
+                <color rgba="1 0.5 0 0.5"/>
+            </material>
         </visual>
+        <xacro:sphere_inertial mass="0.1" radius="0.09" o_xyz="0 0 0" o_rpy="0 0 0"/>
         <collision>
             <geometry>
-                <sphere radius="${link_1_radius}"/>
+                <sphere radius="0.09"/>
             </geometry>
         </collision>
-        <xacro:sphere_inertial mass="0.1" radius="${link_1_radius}" o_xyz="0 0 0" o_rpy="0 0 0"/>
     </link>
-
     <joint name="1_to_2p" type="fixed">
         <parent link="link_1"/>
         <child link="link_2p"/>
-        <origin xyz="0 0 ${link_1_length}" rpy="0 0 0"/>
+        <origin xyz="0 0 0"/>
     </joint>
-
     <!-- *****LINK 2***** -->
     <link name="link_2">
         <visual>
-            <origin xyz="${link_2_length/2} 0 0" rpy="0 ${pi/2} 0"/>
+            <origin xyz="0 0 ${link_2_length/2}" rpy="0 0 0"/>
             <geometry>
                 <cylinder radius="${link_2_radius}" length="${link_2_length}"/>
             </geometry>
-            <material name="orange"/>
+            <material name="link_2_material">
+                <color rgba="1 0.5 0 0.5"/>
+            </material>
         </visual>
+        <xacro:cylinder_inertial mass="1" radius="${link_2_radius}" length="${link_2_length}" o_xyz="0 0 ${link_2_length/2}" o_rpy="0 0 0"/>
         <collision>
-            <origin xyz="${link_2_length/2} 0 0" rpy="0 ${pi/2} 0"/>
+            <origin xyz="0 0 ${link_2_length/2}" rpy="0 0 0"/>
             <geometry>
                 <cylinder radius="${link_2_radius}" length="${link_2_length}"/>
             </geometry>
         </collision>
-        <xacro:cylinder_inertial mass="0.5" radius="${link_2_radius}" length="${link_2_length}" o_xyz="${link_2_length/2} 0 0" o_rpy="0 ${pi/2} 0"/>
     </link>
-
     <joint name="1_to_2" type="revolute">
+        <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
         <parent link="link_1"/>
         <child link="link_2"/>
-        <origin xyz="0 0 ${link_1_length}" rpy="0 0 0"/>
-        <axis xyz="0 1 0"/> <!-- Corrected to rotate around y for horizontal motion -->
-        <limit effort="10" lower="${-0.52}" upper="${pi/2}" velocity="1"/>
+        <axis xyz="0 0 1"/>
+        <limit effort="100" lower="${-0.52}" upper="${pi/2}" velocity="1"/>
         <dynamics damping="0.7"/>
     </joint>
-
     <!-- *****LINK 3p***** -->
     <link name="link_3p">
         <visual>
             <geometry>
-                <sphere radius="${link_2_radius}"/>
+                <sphere radius="0.06"/>
             </geometry>
-            <material name="green"/>
+            <material name="link_3p_material">
+                <color rgba="0 1 0 0.5"/>
+            </material>
         </visual>
+        <xacro:sphere_inertial mass="0.1" radius="0.06" o_xyz="0 0 0" o_rpy="0 0 0"/>
         <collision>
             <geometry>
-                <sphere radius="${link_2_radius}"/>
+                <sphere radius="0.06"/>
             </geometry>
         </collision>
-        <xacro:sphere_inertial mass="0.1" radius="${link_2_radius}" o_xyz="0 0 0" o_rpy="0 0 0"/>
     </link>
-
     <joint name="2_to_3p" type="fixed">
+        <origin xyz="${link_2_length} 0 0" rpy="0 0 0"/>
         <parent link="link_2"/>
         <child link="link_3p"/>
-        <origin xyz="${link_2_length} 0 0" rpy="0 0 0"/>
     </joint>
-
     <!-- *****LINK 3***** -->
     <link name="link_3">
         <visual>
-            <origin xyz="${link_3_length/2} 0 0" rpy="0 ${pi/2} 0"/>
+            <origin xyz="0 0 ${link_3_length/2}" rpy="0 0 0"/>
             <geometry>
                 <cylinder radius="${link_3_radius}" length="${link_3_length}"/>
             </geometry>
-            <material name="green"/>
+            <material name="link_3_material">
+                <color rgba="0 1 0 0.5"/>
+            </material>
         </visual>
+        <xacro:cylinder_inertial mass="1" radius="${link_3_radius}" length="${link_3_length}" o_xyz="0 0 ${link_3_length/2}" o_rpy="0 0 0"/>
         <collision>
-            <origin xyz="${link_3_length/2} 0 0" rpy="0 ${pi/2} 0"/>
+            <origin xyz="0 0 ${link_3_length/2}" rpy="0 0 0"/>
             <geometry>
                 <cylinder radius="${link_3_radius}" length="${link_3_length}"/>
             </geometry>
         </collision>
-        <xacro:cylinder_inertial mass="0.5" radius="${link_3_radius}" length="${link_3_length}" o_xyz="${link_3_length/2} 0 0" o_rpy="0 ${pi/2} 0"/>
     </link>
-
     <joint name="2_to_3" type="revolute">
+        <origin xyz="${link_2_length} 0 0"/>
         <parent link="link_2"/>
         <child link="link_3"/>
-        <origin xyz="${link_2_length} 0 0" rpy="0 0 0"/>
-        <axis xyz="1 0 0"/> <!-- Rotate around x for next segment -->
+        <axis xyz="0 0 1"/>
         <dynamics damping="0.7"/>
-        <limit effort="10" lower="${-pi/2}" upper="${0}" velocity="1"/>
+        <limit effort="100" lower="${-pi/2}" upper="${0}" velocity="1"/>
     </joint>
-
     <!-- *****LINK 4***** -->
     <link name="link_4">
         <visual>
-            <origin xyz="${link_4_length/2} 0 0" rpy="0 ${pi/2} 0"/>
+            <origin xyz="0 0 ${link_4_length/2}" rpy="0 0 0"/>
             <geometry>
                 <cylinder radius="${link_4_radius}" length="${link_4_length}"/>
             </geometry>
-            <material name="blue"/>
+            <material name="link_4_material">
+                <color rgba="0 0 1 0.5"/>
+            </material>
         </visual>
+        <xacro:cylinder_inertial mass="1" radius="${link_4_radius}" length="${link_4_length}" o_xyz="0 0 ${link_4_length/2}" o_rpy="0 0 0"/>
         <collision>
-            <origin xyz="${link_4_length/2} 0 0" rpy="0 ${pi/2} 0"/>
+            <origin xyz="0 0 ${link_4_length/2}" rpy="0 0 0"/>
             <geometry>
                 <cylinder radius="${link_4_radius}" length="${link_4_length}"/>
             </geometry>
         </collision>
-        <xacro:cylinder_inertial mass="0.1" radius="${link_4_radius}" length="${link_4_length}" o_xyz="${link_4_length/2} 0 0" o_rpy="0 ${pi/2} 0"/>
     </link>
-
     <joint name="3_to_4" type="fixed">
+        <origin xyz="${link_4_length+link_3_length} 0 0"/>
         <parent link="link_3"/>
         <child link="link_4"/>
-        <origin xyz="${link_3_length} 0 0" rpy="0 0 0"/>
+        <axis xyz="0 0 1"/>
     </joint>
 </robot>
