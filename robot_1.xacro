@@ -108,7 +108,7 @@
                 <cylinder radius="${link_2_radius}" length="${link_2_length}"/>
             </geometry>
         </collision>
-    </xacro:macro>
+    </link>
     <joint name="1_to_2" type="revolute">
         <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
         <parent link="link_1"/>
